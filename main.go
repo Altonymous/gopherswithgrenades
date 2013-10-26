@@ -47,12 +47,12 @@ func init() {
 	flagSet = flag.NewFlagSet(command, flag.ExitOnError)
 
 	// Creation options
-	flagSet.IntVar(&instanceCount, "count", 5, "help message for count")
-	flagSet.StringVar(&instanceRegionName, "region", "us-east-1", "help message for region")
-	flagSet.StringVar(&instanceImage, "image", "ami-2bc99d42", "help message for image")
-	flagSet.StringVar(&instanceType, "type", "t1.micro", "help message for instance type")
-	flagSet.StringVar(&instanceLogin, "login", "t1.micro", "help message for instance login")
-	flagSet.StringVar(&instanceKey, "key", "gophers", "help message for key")
+	flagSet.IntVar(&instanceCount, "count", 5, "number of gophers to call into action")
+	flagSet.StringVar(&instanceRegionName, "region", "us-east-1", "only us-east-1 is supported at the moment")
+	flagSet.StringVar(&instanceImage, "image", "ami-2bc99d42", "only one image is supported at the moment")
+	flagSet.StringVar(&instanceType, "type", "t1.micro", "specify the instance type on AWS")
+	flagSet.StringVar(&instanceLogin, "login", "ubuntu", "login user for your instance")
+	flagSet.StringVar(&instanceKey, "key", "gophers", "create a key-pair to push to your instance, by default it's called gophers.pem")
 
 	// Attack options
 	flagSet.IntVar(&numberOfRequests, "requests", 5, "Number of requests to perform per gopher")
