@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/altonymous/gopherswithgrenades.png)](https://travis-ci.org/altonymous/gopherswithgrenades)
+[![Build Status](https://travis-ci.org/Altonymous/gopherswithgrenades.png)](https://travis-ci.org/altonymous/gopherswithgrenades)
 
 # Gophers with Grenades 
 
