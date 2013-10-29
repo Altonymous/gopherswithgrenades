@@ -18,7 +18,7 @@ Testing:
 
 ## Travis-CI
 
-You can see a build status: https://travis-ci.org/altonymous/gopherswithgrenades
+You can see a build status: https://travis-ci.org/Altonymous/gopherswithgrenades
 
 
 ## References
