@@ -9,11 +9,11 @@ This is a load testing suite that uses AWS and apachebench to slam your chosen U
 
 You can use go get command: 
 
-    go get github.com/altonymous/gopherswithgrenades 
+    go get github.com/Altonymous/gopherswithgrenades 
 
 Testing:
 
-    go test github.com/altonymous/gopherswithgrenades 
+    go test github.com/Altonymous/gopherswithgrenades 
 
 
 ## Travis-CI
