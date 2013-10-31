@@ -6,8 +6,8 @@ This is a load testing suite that uses AWS and apachebench to slam your chosen U
 
 ## Dependencies
 
-# AWS account.
-# PEM Key file to place on the server to manage connections
+- AWS account.
+- PEM Key file to place on the server to manage connections
   - Must be in your ~/.ssh directory.
   - Must set the permissions to read-only.
 
