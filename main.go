@@ -47,18 +47,18 @@ func init() {
 	flagSet = flag.NewFlagSet(command, flag.ExitOnError)
 
 	// Creation options
-	flagSet.IntVar(&instanceCount, "count", 5, "number of gophers to call into action")
-	flagSet.StringVar(&instanceRegionName, "region", "us-east-1", "only us-east-1 is supported at the moment")
-	flagSet.StringVar(&instanceImage, "image", "ami-2bc99d42", "only one image is supported at the moment")
-	flagSet.StringVar(&instanceType, "type", "t1.micro", "specify the instance type on AWS")
-	flagSet.StringVar(&instanceLogin, "login", "ubuntu", "login user for your instance")
-	flagSet.StringVar(&instanceKey, "key", "gophers", "create a key-pair to push to your instance, by default it's called gophers.pem")
+	flagSet.IntVar(&instanceCount, "count", 5, "The number of gophers to call into action")
+	flagSet.StringVar(&instanceRegionName, "region", "us-east-1", "The availability zone to start each gopher in (default: us-east-1d)")
+	flagSet.StringVar(&instanceImage, "image", "ami-2bc99d42", "The image id to use for each gopher (default: ami-2bc99d42)")
+	flagSet.StringVar(&instanceType, "type", "t1.micro", "The instance type to use for each gopher (default: t1.micro)")
+	flagSet.StringVar(&instanceLogin, "login", "ubuntu", "The ssh username name to use to connect to the new servers (default: ubuntu).")
+	flagSet.StringVar(&instanceKey, "key", "gophers", "The ssh key pair name to use to connect to the new gophers (default: gophers)")
 
 	// Attack options
-	flagSet.IntVar(&numberOfRequests, "requests", 5, "Number of requests to perform per gopher")
-	flagSet.IntVar(&concurrentRequests, "concurrent", 1, "Number of concurrent requests to make per gopher")
-	flagSet.StringVar(&url, "url", "", "help message for url to attack")
-	flagSet.StringVar(&options, "options", "", "additional options to pass to apache bench")
+	flagSet.IntVar(&numberOfRequests, "requests", 5, "The number of requests to perform per gopher")
+	flagSet.IntVar(&concurrentRequests, "concurrent", 1, "The number of concurrent requests to make per gopher")
+	flagSet.StringVar(&url, "url", "", "The url to point the gophers towards when attacking")
+	flagSet.StringVar(&options, "options", "", "Additional attack options (Not supported yet)")
 
 	setupRegion()
 }
@@ -88,7 +88,7 @@ func main() {
 }
 
 func up() {
-	println("Gophers are breeding")
+	fmt.Println(fmt.Sprintf("Adding %v gopher(s) to your army.", instanceCount))
 
 	createInstances := ec2.RunInstances{
 		MinCount:     instanceCount,
@@ -120,6 +120,8 @@ func up() {
 	instances, err := findInstances(16)
 	handleError(err)
 
+	fmt.Println("\nArming your gophers with grenades, stand back!")
+
 	setupResponseChannel := make(chan setupResponse)
 	for _, instance := range instances {
 		setupInstance(setupResponseChannel, instance.DNSName)
@@ -128,7 +130,7 @@ func up() {
 	for i := 0; i < len(instances); i++ {
 		resp := <-setupResponseChannel
 		if resp.err != nil {
-			fmt.Println("Looks like the gophers were inbred.")
+			fmt.Println("Looks like the gophers were inbred, check your AWS account to make sure things haven't gone awry.")
 		}
 	}
 
@@ -136,7 +138,7 @@ func up() {
 }
 
 func down() {
-	fmt.Println("Terminating gophers")
+	fmt.Println("Your gopher army has been nuked from orbit.")
 
 	instances, err := findInstances(-1)
 	handleError(err)
@@ -148,7 +150,7 @@ func down() {
 }
 
 func attack() {
-	fmt.Println("Gophers are on the move!")
+	fmt.Println("your gophers are on the move!")
 
 	if url == "" {
 		fmt.Println("You must provide a url to start the attack.")
@@ -189,17 +191,21 @@ func report() {
 	instances, err := findInstances(-1)
 	handleError(err)
 
-	fmt.Println("Name (DNS Name) - State")
-	for _, instance := range instances {
-		var instanceName string
+	if len(instances) > 0 {
+		fmt.Println("Name (DNS Name) - State")
+		for _, instance := range instances {
+			var instanceName string
 
-		for _, tag := range instance.Tags {
-			if tag.Key == "Name" {
-				instanceName = tag.Value
+			for _, tag := range instance.Tags {
+				if tag.Key == "Name" {
+					instanceName = tag.Value
+				}
 			}
-		}
 
-		fmt.Println(fmt.Sprintf("%s (%s) - %s", instanceName, instance.DNSName, instance.State.Name))
+			fmt.Println(fmt.Sprintf("%s (%s) - %s", instanceName, instance.DNSName, instance.State.Name))
+		}
+	} else {
+		fmt.Println("Your army has gone AWOL.  Better recruit some more!")
 	}
 }
 
