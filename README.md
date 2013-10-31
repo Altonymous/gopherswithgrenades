@@ -29,4 +29,5 @@ How to Write Go Code: http://golang.org/doc/code.html
 
 ## Special Thanks
 beeswithmachineguns - Inspiration and something to model my project after. (https://github.com/newsapps/beeswithmachineguns/)
+
 IRC Freenode Channel - #go-nuts - For putting up with all my silly questions!
