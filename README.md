@@ -4,6 +4,12 @@
 
 This is a load testing suite that uses AWS and apachebench to slam your chosen URL
 
+## Dependencies
+
+# AWS account.
+# PEM Key file to place on the server to manage connections
+  - Must be in your ~/.ssh directory.
+  - Must set the permissions to read-only.
 
 ## Local Build and Test
 
@@ -11,7 +17,7 @@ You can use go get command:
 
     go get github.com/Altonymous/gopherswithgrenades 
 
-Testing:
+Testing: (Not setup yet)
 
     go test github.com/Altonymous/gopherswithgrenades 
 
