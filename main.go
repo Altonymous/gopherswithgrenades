@@ -246,7 +246,7 @@ func setupInstance(response chan setupResponse, host string) {
 		var outputBuffer bytes.Buffer
 		session.Stdout = &outputBuffer
 		// fmt.Println("making the call")
-		err := session.Run("sudo apt-get -o Debug::pkgProblemResolver=true install apache2-utils -y")
+		err := session.Run("sudo apt-get install apache2-utils -y")
 		if err != nil {
 			setupResponse.err = append(setupResponse.err, err)
 		}
