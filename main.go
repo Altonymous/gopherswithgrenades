@@ -88,8 +88,12 @@ func main() {
 }
 
 func up() {
-	fmt.Println(fmt.Sprintf("Adding %v gopher(s) to your army.", instanceCount))
+	fmt.Printf("Adding %v gopher(s) to your army.\n", instanceCount)
 
+	if instanceCount <= 0 {
+		fmt.Printf("You must declare a number of gophers greater than 0.")
+		return
+	}
 	createInstances := ec2.RunInstances{
 		MinCount:     instanceCount,
 		MaxCount:     instanceCount,
@@ -105,19 +109,25 @@ func up() {
 	_, err = tagInstances(runInstancesResponse.Instances)
 	handleError(err)
 
-	for {
+	instances, err := findInstances(0)
+	handleError(err)
+
+	notReadyInstancesCount := len(instances)
+	for notReadyInstancesCount != 0 {
+		time.Sleep(3 * time.Second)
 		instances, err := findInstances(0)
 		handleError(err)
 
-		if len(instances) == 0 {
-			break
+		readyInstancesCount := notReadyInstancesCount - len(instances)
+
+		for i := 0; i < readyInstancesCount; i++ {
+			fmt.Printf(".")
 		}
 
-		fmt.Print(".")
-		time.Sleep(3 * time.Second)
+		notReadyInstancesCount = len(instances)
 	}
 
-	instances, err := findInstances(16)
+	instances, err = findInstances(16)
 	handleError(err)
 
 	fmt.Println("\nArming your gophers with grenades, stand back!")
@@ -131,10 +141,12 @@ func up() {
 		resp := <-setupResponseChannel
 		if resp.err != nil {
 			fmt.Println("Looks like the gophers were inbred, check your AWS account to make sure things haven't gone awry.")
+			fmt.Printf("Message: (%v) %v\n", resp.host, resp.message)
+			fmt.Printf("Error: (%v) %v\n", resp.host, resp.err)
 		}
 	}
 
-	fmt.Println(fmt.Sprintf("\n%v gophers are ready to invade!", len(instances)))
+	fmt.Printf("\n%v gophers are ready to invade!\n", len(instances))
 }
 
 func down() {
@@ -202,7 +214,7 @@ func report() {
 				}
 			}
 
-			fmt.Println(fmt.Sprintf("%s (%s) - %s", instanceName, instance.DNSName, instance.State.Name))
+			fmt.Printf("%s (%s) - %s\n", instanceName, instance.DNSName, instance.State.Name)
 		}
 	} else {
 		fmt.Println("Your army has gone AWOL.  Better recruit some more!")
@@ -211,27 +223,36 @@ func report() {
 
 func setupInstance(response chan setupResponse, host string) {
 	go func() {
-		setupResponse := setupResponse{}
+		setupResponse := setupResponse{host: host}
 
-		client, err := sshClient(fmt.Sprintf("%s:22", host))
-		if err != nil {
-			setupResponse.err = append(setupResponse.err, err)
+		var client *ssh.ClientConn
+		for i := 0; client == nil || i == 10; i++ {
+			time.Sleep(2 * time.Second)
+			// fmt.Printf("Attempting to create and ssh connection to %s.\n", host)
+			client, _ = sshClient(fmt.Sprintf("%s:22", host))
 		}
 
-		session, err := client.NewSession()
-		if err != nil {
-			setupResponse.err = append(setupResponse.err, err)
+		var session *ssh.Session
+		for i := 0; session == nil || i == 10; i++ {
+			time.Sleep(2 * time.Second)
+			// fmt.Printf("creating the session: %v\n", client)
+			session, _ = client.NewSession()
 		}
 
+		// fmt.Println("defering the session")
 		defer session.Close()
 
+		// fmt.Println("setting up the buffer")
 		var outputBuffer bytes.Buffer
 		session.Stdout = &outputBuffer
-		err = session.Run("sudo apt-get install apache2-utils -y")
+		// fmt.Println("making the call")
+		err := session.Run("sudo apt-get -o Debug::pkgProblemResolver=true install apache2-utils -y")
 		if err != nil {
 			setupResponse.err = append(setupResponse.err, err)
 		}
 
+		setupResponse.message = outputBuffer.String()
+		// fmt.Println("returning the response")
 		response <- setupResponse
 	}()
 }

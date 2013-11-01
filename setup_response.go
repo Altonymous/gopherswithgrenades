@@ -1,5 +1,7 @@
 package main
 
 type setupResponse struct {
-	err []error
+	host    string
+	message string
+	err     []error
 }
