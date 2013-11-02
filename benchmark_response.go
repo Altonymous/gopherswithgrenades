@@ -1,9 +1,9 @@
 package main
 
 type benchmarkResponse struct {
-	Complete          int
-	Failed            int
-	RequestsPerSecond float32
-	TimePerRequest    float32
+	complete          int
+	failed            int
+	requestsPerSecond float32
+	timePerRequest    float32
 	err               []error
 }

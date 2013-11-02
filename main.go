@@ -181,10 +181,10 @@ func attack() {
 			fmt.Println("Looks like the gophers started a civil war.")
 		}
 
-		complete += resp.Complete
-		failed += resp.Failed
-		requestsPerSecond += resp.RequestsPerSecond
-		totalTime += resp.TimePerRequest * float32(resp.Complete+resp.Failed)
+		complete += resp.complete
+		failed += resp.failed
+		requestsPerSecond += resp.requestsPerSecond
+		totalTime += resp.timePerRequest * float32(resp.complete+resp.failed)
 	}
 
 	fmt.Println("Completed requests:", complete)
@@ -284,23 +284,23 @@ func startAttack(response chan benchmarkResponse, host string) {
 		for _, line := range strings.Split(outputString, "\n") {
 			if strings.Contains(line, "Complete requests:") {
 				value := strings.TrimSpace(strings.Split(line, ":")[1])
-				benchmarkResponse.Complete, _ = strconv.Atoi(value)
+				benchmarkResponse.complete, _ = strconv.Atoi(value)
 			}
 			if strings.Contains(line, "Failed requests:") {
 				value := strings.TrimSpace(strings.Split(line, ":")[1])
-				benchmarkResponse.Failed, _ = strconv.Atoi(value)
+				benchmarkResponse.failed, _ = strconv.Atoi(value)
 			}
 			if strings.Contains(line, "Requests per second:") {
 				re := regexp.MustCompile("Requests per second:\\s*(\\d+.\\d+)")
 				value := re.FindStringSubmatch(line)[1]
 				valueFloat, _ := strconv.ParseFloat(value, 32)
-				benchmarkResponse.RequestsPerSecond = float32(valueFloat)
+				benchmarkResponse.requestsPerSecond = float32(valueFloat)
 			}
 			if strings.Contains(line, "Time per request:") && !strings.Contains(line, "across all concurrent requests") {
 				re := regexp.MustCompile("Time per request:\\s*(\\d+.\\d+)\\s*\\[ms\\]\\s*\\(mean\\)")
 				value := re.FindStringSubmatch(line)[1]
 				valueFloat, _ := strconv.ParseFloat(value, 32)
-				benchmarkResponse.TimePerRequest = float32(valueFloat)
+				benchmarkResponse.timePerRequest = float32(valueFloat)
 			}
 		}
 
