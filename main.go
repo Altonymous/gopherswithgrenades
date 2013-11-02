@@ -16,10 +16,6 @@ import (
 	"time"
 )
 
-const (
-	FILE_NAME = "/tmp/gopher_instances"
-)
-
 // Command Line Variables
 var command string
 
